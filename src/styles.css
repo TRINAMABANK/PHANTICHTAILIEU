@@ -365,38 +365,38 @@ html, body {
   color: var(--text-muted);
 }
 
-/* 3D AI PROCESSOR LOGO BANNER (ULTRA-CLEAR HIGH CONTRAST VISIBILITY AT BOTTOM LEFT) */
+/* 3D AI PROCESSOR LOGO BANNER (RAZOR SHARP ZERO-BLUR HIGH CONTRAST) */
 .sidebar-ai-banner {
   height: 155px;
-  background: radial-gradient(circle at center, #260943 0%, #0b0217 95%);
-  border: 1.5px solid #ec4899;
+  background: radial-gradient(circle at center, #23083e 0%, #0a0215 95%);
+  border: 2px solid #ec4899;
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 20px rgba(236, 72, 153, 0.35), inset 0 0 25px rgba(6, 182, 212, 0.2);
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
   padding: 6px;
   transition: all 0.3s ease;
 }
 
 .sidebar-ai-banner:hover {
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.6), inset 0 0 30px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.6);
 }
 
 .ai-chip-svg-logo {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: brightness(1.2) contrast(1.15) drop-shadow(0 0 12px rgba(236, 72, 153, 0.8));
+  filter: contrast(1.25) brightness(1.15);
   transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 .sidebar-ai-banner:hover .ai-chip-svg-logo {
   transform: scale(1.06);
-  filter: brightness(1.3) contrast(1.2) drop-shadow(0 0 20px rgba(6, 182, 212, 0.9));
+  filter: contrast(1.35) brightness(1.25);
 }
 
 /* ==========================================================================
