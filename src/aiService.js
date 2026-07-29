@@ -22,7 +22,8 @@ export async function askAiAgent({ prompt, documents, settings }) {
  * OpenAI ChatGPT API Call
  */
 async function queryOpenAI({ prompt, docContexts, settings }) {
-  const model = settings.openaiModel || 'gpt-4o-mini';
+  const apiKey = (settings.openaiKey || '').trim();
+  const model = (settings.openaiModel || 'gpt-4o-mini').trim();
   const systemInstruction = (settings.systemPrompt || 'Bạn là Trợ lý AI cho Kho Kiến Thức.') + 
     `\n\nDưới đây là toàn bộ tài liệu được nạp vào kho kiến thức:\n${docContexts}\n\nHãy trả lời câu hỏi của người dùng dựa trên thông tin trong tài liệu. Chỉ ra rõ tài liệu được trích dẫn (ví dụ: tài liệu \`ten_file.pdf\`).`;
 
@@ -30,7 +31,7 @@ async function queryOpenAI({ prompt, docContexts, settings }) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${settings.openaiKey}`
+      'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
       model: model,
@@ -52,35 +53,72 @@ async function queryOpenAI({ prompt, docContexts, settings }) {
 }
 
 /**
- * Google Gemini API Call
+ * Google Gemini API Call with Auto Model Fallback & Unicode Dash Sanitization
  */
 async function queryGemini({ prompt, docContexts, settings }) {
-  const model = settings.geminiModel || 'gemini-1.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${settings.geminiKey}`;
+  const apiKey = (settings.geminiKey || '').trim();
+  let rawModel = (settings.geminiModel || 'gemini-1.5-flash').replace(/[\u2013\u2014]/g, '-').trim();
+
+  // Candidate models to try in sequence if 404 occurs
+  const candidateModels = Array.from(new Set([
+    rawModel,
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-1.5-flash-latest',
+    'gemini-1.5-pro'
+  ]));
 
   const fullPrompt = `${settings.systemPrompt || ''}\n\n[KHO KIẾN THỨC TÀI LIỆU]:\n${docContexts}\n\n[CÂU HỎI NGƯỜI DÙNG]:\n${prompt}\n\nHãy trả lời chi tiết và nêu tên file tài liệu liên quan.`;
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      contents: [
-        {
-          parts: [{ text: fullPrompt }]
-        }
-      ]
-    })
-  });
+  let lastError = null;
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error?.message || `Lỗi API Gemini (${response.status})`);
+  for (const model of candidateModels) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: fullPrompt }]
+            }
+          ]
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Không nhận được câu trả lời từ Gemini.';
+      }
+
+      const errorData = await response.json().catch(() => ({}));
+      const errMsg = errorData.error?.message || `Lỗi API Gemini (${response.status})`;
+
+      // If 404 model not found, try next candidate model
+      if (response.status === 404 || errMsg.includes('not found')) {
+        lastError = new Error(errMsg);
+        continue;
+      }
+
+      // If API key is invalid or quota exceeded, throw immediately with helpful guidance
+      if (response.status === 400 || response.status === 403) {
+        throw new Error(`API Key Gemini chưa chính xác hoặc không đủ quyền. Hãy kiểm tra lại key tại aistudio.google.com. Chi tiết: ${errMsg}`);
+      }
+
+      throw new Error(errMsg);
+    } catch (err) {
+      if (err.message && err.message.includes('API Key Gemini')) {
+        throw err;
+      }
+      lastError = err;
+    }
   }
 
-  const data = await response.json();
-  return data.candidates[0]?.content?.parts[0]?.text || 'Không nhận được câu trả lời từ Gemini.';
+  throw lastError || new Error('Không thể kết nối tới Google Gemini API.');
 }
 
 /**
