@@ -1,9 +1,9 @@
 /* ==========================================================================
-   KHO KIẾN THỨC AI - HIGH-TECH INTERACTIVE NEON (HỒNG - ĐEN - XANH - ĐỎ ĐEN)
+   KHO KIẾN THỨC AI - DUAL THEME SYSTEM (BAN NGÀY & BAN ĐÊM)
    ========================================================================== */
 
 :root {
-  /* Tech Palette: Deep Obsidian Black + Neon Pink + Electric Blue + Crimson Red */
+  /* Default Night Mode (Ban Đêm / Dark Cyberpunk) */
   --bg-page: #040207;
   --bg-sidebar: #080310;
   --bg-card: #0e051a;
@@ -14,7 +14,6 @@
   --border-card: #280d46;
   --border-card-hover: #06b6d4;
 
-  /* Vibrant Colors */
   --neon-pink: #ec4899;
   --neon-magenta: #d946ef;
   --neon-cyan: #06b6d4;
@@ -22,10 +21,11 @@
   --neon-red: #ef4444;
   --dark-red: #7f1d1d;
 
-  /* Dynamic Multi-Tone Gradients */
   --tech-gradient: linear-gradient(135deg, #d946ef 0%, #ec4899 30%, #06b6d4 70%, #ef4444 100%);
   --btn-tech-gradient: linear-gradient(90deg, #ec4899 0%, #d946ef 25%, #06b6d4 60%, #ef4444 100%);
   --user-bubble-gradient: linear-gradient(135deg, #be185d 0%, #0284c7 50%, #991b1b 100%);
+  --bot-bubble-bg: #120521;
+  --bot-bubble-border: #2f0b4a;
   --title-gradient: linear-gradient(90deg, #ec4899 0%, #38bdf8 50%, #f87171 100%);
 
   --text-white: #ffffff;
@@ -52,6 +52,51 @@
   --font-code: 'JetBrains Mono', monospace;
 }
 
+/* ==========================================================================
+   DAY MODE OVERRIDES (BAN NGÀY - LIGHT THEME)
+   ========================================================================== */
+body.light-theme {
+  --bg-page: #f8fafc;
+  --bg-sidebar: #ffffff;
+  --bg-card: #f1f5f9;
+  --bg-card-hover: linear-gradient(135deg, #fce7f3 0%, #e0f2fe 50%, #fef2f2 100%);
+  --bg-chat-container: #ffffff;
+
+  --border-sidebar: #e2e8f0;
+  --border-card: #cbd5e1;
+  --border-card-hover: #2563eb;
+
+  --neon-pink: #db2777;
+  --neon-magenta: #c026d3;
+  --neon-cyan: #0284c7;
+  --neon-blue: #2563eb;
+  --neon-red: #dc2626;
+
+  --tech-gradient: linear-gradient(135deg, #db2777 0%, #9333ea 50%, #2563eb 100%);
+  --btn-tech-gradient: linear-gradient(90deg, #db2777 0%, #c026d3 40%, #2563eb 100%);
+  --user-bubble-gradient: linear-gradient(135deg, #db2777 0%, #2563eb 100%);
+  --bot-bubble-bg: #f8fafc;
+  --bot-bubble-border: #e2e8f0;
+  --title-gradient: linear-gradient(90deg, #db2777 0%, #2563eb 100%);
+
+  --text-white: #0f172a;
+  --text-pink: #db2777;
+  --text-cyan: #0284c7;
+  --text-muted: #475569;
+  --text-sub: #64748b;
+
+  --pdf-bg: #fce7f3;
+  --pdf-text: #db2777;
+  --txt-bg: #f3e8ff;
+  --txt-text: #9333ea;
+  --md-bg: #e0f2fe;
+  --md-text: #0284c7;
+  --word-bg: #dbeafe;
+  --word-text: #2563eb;
+  --ppt-bg: #fee2e2;
+  --ppt-text: #dc2626;
+}
+
 /* Resets */
 * {
   box-sizing: border-box;
@@ -66,6 +111,7 @@ html, body {
   background-color: var(--bg-page);
   color: var(--text-white);
   overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -75,10 +121,22 @@ html, body {
   width: 100vw;
   height: 100vh;
   background-color: var(--bg-page);
+  transition: background-color 0.3s ease;
+}
+
+body.dark-theme .app-container {
   background-image: 
     radial-gradient(circle 350px at var(--mouse-x) var(--mouse-y), rgba(236, 72, 153, 0.12) 0%, rgba(6, 182, 212, 0.1) 40%, rgba(239, 68, 68, 0.08) 70%, transparent 100%),
     linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 28px 28px, 28px 28px;
+}
+
+body.light-theme .app-container {
+  background-image: 
+    radial-gradient(circle 350px at var(--mouse-x) var(--mouse-y), rgba(219, 39, 119, 0.06) 0%, rgba(37, 99, 235, 0.06) 50%, transparent 100%),
+    linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
   background-size: 100% 100%, 28px 28px, 28px 28px;
 }
 
@@ -94,7 +152,8 @@ html, body {
   justify-content: space-between;
   padding: 20px 16px;
   z-index: 10;
-  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
 }
 
 .sidebar-header {
@@ -118,7 +177,7 @@ html, body {
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
 }
 
 @keyframes techGradientMove {
@@ -167,7 +226,7 @@ html, body {
   color: var(--neon-cyan);
 }
 
-/* Document Cards with Dynamic Mouse Hover Color Shift */
+/* Document Cards */
 .doc-list {
   display: flex;
   flex-direction: column;
@@ -198,7 +257,7 @@ html, body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.15), transparent);
   transition: left 0.5s ease;
 }
 
@@ -209,7 +268,6 @@ html, body {
 .doc-card.active, .doc-card:hover {
   background: var(--bg-card-hover);
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3), inset 0 0 15px rgba(236, 72, 153, 0.2);
   transform: translateX(4px);
 }
 
@@ -255,7 +313,7 @@ html, body {
 }
 
 .doc-card.active .doc-title, .doc-card:hover .doc-title {
-  color: var(--neon-cyan);
+  color: var(--neon-pink);
 }
 
 .doc-sub {
@@ -286,7 +344,7 @@ html, body {
   transform: scale(1.2);
 }
 
-/* Upload Button with Shifting Rainbow Hologram */
+/* Upload Button */
 .btn-primary.upload-btn {
   width: 100%;
   padding: 13px 18px;
@@ -295,7 +353,7 @@ html, body {
   background: var(--btn-tech-gradient);
   background-size: 250% 250%;
   animation: techGradientMove 5s infinite linear;
-  color: var(--text-white);
+  color: #ffffff;
   font-size: 14px;
   font-weight: 700;
   display: flex;
@@ -303,14 +361,14 @@ html, body {
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+  box-shadow: 0 4px 15px rgba(219, 39, 119, 0.3);
   transition: all 0.3s ease;
   margin-bottom: 20px;
 }
 
 .btn-primary.upload-btn:hover {
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.7), 0 0 15px rgba(239, 68, 68, 0.5);
   transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 22px rgba(219, 39, 119, 0.45);
 }
 
 /* Storage Meter Card */
@@ -346,7 +404,7 @@ html, body {
 .progress-bar-bg {
   width: 100%;
   height: 6px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 8px;
@@ -365,25 +423,25 @@ html, body {
   color: var(--text-muted);
 }
 
-/* 3D AI PROCESSOR LOGO BANNER (RAZOR SHARP ZERO-BLUR HIGH CONTRAST) */
+/* 3D AI PROCESSOR LOGO BANNER */
 .sidebar-ai-banner {
   height: 155px;
-  background: radial-gradient(circle at center, #23083e 0%, #0a0215 95%);
-  border: 2px solid #ec4899;
+  background: radial-gradient(circle at center, rgba(236, 72, 153, 0.15) 0%, var(--bg-sidebar) 95%);
+  border: 2px solid var(--neon-pink);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.3);
   padding: 6px;
   transition: all 0.3s ease;
 }
 
 .sidebar-ai-banner:hover {
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 25px rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.5);
 }
 
 .ai-chip-svg-logo {
@@ -409,6 +467,7 @@ html, body {
   flex-direction: column;
   background: var(--bg-page);
   padding: 16px 20px;
+  transition: background-color 0.3s ease;
 }
 
 .chat-outer-frame {
@@ -416,18 +475,17 @@ html, body {
   display: flex;
   flex-direction: column;
   background: var(--bg-chat-container);
-  border: 1px solid var(--border-chat-frame);
+  border: 1px solid var(--border-card);
   border-radius: 20px;
-  box-shadow: inset 0 0 30px rgba(44, 11, 72, 0.4), 0 0 20px rgba(6, 182, 212, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   padding: 16px 20px;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  transition: all 0.3s ease;
 }
 
 .chat-outer-frame:hover {
   border-color: var(--neon-pink);
-  box-shadow: inset 0 0 40px rgba(236, 72, 153, 0.25), 0 0 30px rgba(6, 182, 212, 0.2);
 }
 
 .chat-header {
@@ -449,7 +507,7 @@ html, body {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #160628;
+  background: var(--bg-card);
   border: 2px solid var(--neon-pink);
   display: flex;
   align-items: center;
@@ -514,10 +572,9 @@ html, body {
 }
 
 .header-icon-btn:hover {
-  color: var(--neon-cyan);
-  border-color: var(--neon-cyan);
+  color: var(--neon-pink);
+  border-color: var(--neon-pink);
   transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
 }
 
 .chat-history {
@@ -567,13 +624,13 @@ html, body {
 }
 
 .chat-message.bot .msg-avatar {
-  background: #140524;
+  background: var(--bg-card);
   border-color: var(--neon-pink);
   color: var(--neon-pink);
 }
 
 .chat-message.user .msg-avatar {
-  background: #140524;
+  background: var(--bg-card);
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
 }
@@ -593,14 +650,10 @@ html, body {
 }
 
 .chat-message.bot .msg-bubble {
-  background: #120521;
-  border: 1px solid #2f0b4a;
+  background: var(--bot-bubble-bg);
+  border: 1px solid var(--bot-bubble-border);
   color: var(--text-white);
   border-top-left-radius: 4px;
-}
-.chat-message.bot:hover .msg-bubble {
-  border-color: var(--neon-pink);
-  box-shadow: 0 0 15px rgba(236, 72, 153, 0.2);
 }
 
 .chat-message.user .msg-bubble {
@@ -608,17 +661,13 @@ html, body {
   background-size: 200% 200%;
   color: #ffffff;
   border-top-right-radius: 4px;
-  box-shadow: 0 0 15px rgba(219, 39, 119, 0.3);
+  box-shadow: 0 4px 15px rgba(219, 39, 119, 0.25);
   transition: all 0.3s ease;
-}
-
-.chat-message.user:hover .msg-bubble {
-  box-shadow: 0 0 25px rgba(6, 182, 212, 0.5), 0 0 15px rgba(239, 68, 68, 0.4);
 }
 
 .msg-timestamp {
   font-size: 11px;
-  color: #a78bfa;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 .chat-message.user .msg-timestamp {
@@ -645,7 +694,6 @@ html, body {
   font-weight: 700;
 }
 
-/* PRO QUICK PROMPT PILLS WITH HOVER COLOR SHIFT */
 .quick-prompts {
   display: flex;
   gap: 8px;
@@ -658,8 +706,8 @@ html, body {
   font-size: 11.5px;
   font-weight: 600;
   color: var(--neon-pink);
-  background: rgba(236, 72, 153, 0.1);
-  border: 1px solid rgba(236, 72, 153, 0.3);
+  background: rgba(236, 72, 153, 0.08);
+  border: 1px solid rgba(236, 72, 153, 0.25);
   padding: 5px 12px;
   border-radius: 9999px;
   cursor: pointer;
@@ -669,49 +717,39 @@ html, body {
 
 .quick-prompt-pill:hover {
   color: var(--neon-cyan);
-  background: rgba(6, 182, 212, 0.2);
+  background: rgba(6, 182, 212, 0.15);
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
   transform: translateY(-2px);
 }
 
-/* CHAT INPUT CAPSULE WITH MULTI-COLOR NEON FOCUS */
+/* CHAT INPUT CAPSULE */
 .chat-input-wrapper {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #120421;
-  border: 1px solid #350e59;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: 16px;
   padding: 8px 10px 8px 14px;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
   margin-top: auto;
   transition: all 0.3s ease;
 }
 
 .chat-input-wrapper:focus-within {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 25px rgba(6, 182, 212, 0.4), 0 0 12px rgba(239, 68, 68, 0.3);
+  border-color: var(--neon-pink);
 }
 
 .input-sparkle-btn {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: #1e0735;
-  border: 1px solid #3d0d66;
+  background: rgba(236, 72, 153, 0.08);
+  border: 1px solid var(--neon-pink);
   color: var(--neon-pink);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.chat-input-wrapper:focus-within .input-sparkle-btn {
-  color: var(--neon-cyan);
-  border-color: var(--neon-cyan);
-  transform: rotate(15deg);
 }
 
 .chat-input {
@@ -725,7 +763,7 @@ html, body {
 }
 
 .chat-input::placeholder {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .btn-send {
@@ -742,12 +780,11 @@ html, body {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
+  box-shadow: 0 4px 15px rgba(219, 39, 119, 0.3);
   transition: all 0.25s ease;
 }
 
 .btn-send:hover {
-  box-shadow: 0 0 25px rgba(6, 182, 212, 0.7), 0 0 15px rgba(239, 68, 68, 0.5);
   transform: translateY(-2px) scale(1.03);
 }
 
@@ -765,7 +802,7 @@ html, body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(4, 1, 8, 0.85);
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -784,10 +821,10 @@ html, body {
 .modal-card {
   width: 90%;
   max-width: 520px;
-  background: #0f041c;
-  border: 1px solid #3b0d61;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-card);
   border-radius: 20px;
-  box-shadow: 0 0 40px rgba(217, 70, 239, 0.25);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
 
@@ -800,7 +837,7 @@ html, body {
   justify-content: space-between;
   align-items: center;
   padding: 18px 24px;
-  border-bottom: 1px solid #24083b;
+  border-bottom: 1px solid var(--border-card);
 }
 
 .modal-header h2 {
@@ -828,7 +865,7 @@ html, body {
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 24px;
-  border-top: 1px solid #24083b;
+  border-top: 1px solid var(--border-card);
 }
 
 .dropzone {
@@ -838,12 +875,10 @@ html, body {
   text-align: center;
   background: rgba(236, 72, 153, 0.04);
   cursor: pointer;
-  transition: border-color 0.3s, background 0.3s;
 }
 
 .dropzone:hover {
   border-color: var(--neon-cyan);
-  background: rgba(6, 182, 212, 0.08);
 }
 
 .dropzone-icon {
@@ -870,8 +905,8 @@ html, body {
 .form-control {
   width: 100%;
   padding: 10px 14px;
-  background: #1a062e;
-  border: 1px solid #3b0d61;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: 8px;
   color: var(--text-white);
   outline: none;
@@ -882,7 +917,7 @@ html, body {
 
 .btn-secondary {
   padding: 9px 18px;
-  border: 1px solid #3b0d61;
+  border: 1px solid var(--border-card);
   border-radius: 9999px;
   background: transparent;
   color: var(--text-muted);
@@ -891,8 +926,8 @@ html, body {
 }
 
 .preview-text-box {
-  background: #140524;
-  border: 1px solid #2a0b45;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: 8px;
   padding: 16px;
   font-family: var(--font-code);

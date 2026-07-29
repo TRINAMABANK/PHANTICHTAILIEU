@@ -102,6 +102,17 @@ function saveState() {
 
 function applyTheme(theme) {
   document.body.className = theme === 'light' ? 'light-theme' : 'dark-theme';
+  const moonIcon = document.getElementById('themeMoonIcon');
+  const sunIcon = document.getElementById('themeSunIcon');
+  if (moonIcon && sunIcon) {
+    if (theme === 'light') {
+      moonIcon.style.display = 'none';
+      sunIcon.style.display = 'block';
+    } else {
+      moonIcon.style.display = 'block';
+      sunIcon.style.display = 'none';
+    }
+  }
 }
 
 function renderDocuments() {

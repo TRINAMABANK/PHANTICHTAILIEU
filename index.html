@@ -73,7 +73,7 @@
         </div>
       </div>
 
-      <!-- 3D ISOMETRIC AI CHIP GRAPHIC BANNER (Rendering exact SVG Graphic matching user image!) -->
+      <!-- 3D ISOMETRIC AI CHIP GRAPHIC BANNER -->
       <div class="sidebar-ai-banner">
         <img src="/ai_chip_logo.svg" alt="3D AI Processor Chip" class="ai-chip-svg-logo" />
       </div>
@@ -104,6 +104,24 @@
               <span>Online</span>
             </div>
 
+            <!-- Day / Night Theme Toggle Button -->
+            <button class="header-icon-btn" id="themeToggleBtn" title="Chuyển chế độ Ban ngày / Ban đêm">
+              <svg id="themeMoonIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+              <svg id="themeSunIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+
             <!-- Clear Chat Button -->
             <button class="header-icon-btn" id="clearChatBtn" title="Xóa lịch sử hội thoại" style="color: #ef4444;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -113,7 +131,7 @@
             </button>
 
             <!-- Settings / Gem Button -->
-            <button class="header-icon-btn" id="openSettingsModalBtn" title="Cấu hình Gem & API Gemini/ChatGPT" style="color: var(--accent-pink-neon);">
+            <button class="header-icon-btn" id="openSettingsModalBtn" title="Cấu hình Gem & API Gemini/ChatGPT" style="color: var(--neon-pink);">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -191,7 +209,7 @@
         </div>
 
         <div class="upload-progress-container" id="uploadProgressContainer" style="display: none; margin-top: 16px;">
-          <div class="upload-status-text" id="uploadStatusText" style="font-size: 12px; color: var(--accent-pink-neon); margin-bottom: 6px;">Đang trích xuất nội dung...</div>
+          <div class="upload-status-text" id="uploadStatusText" style="font-size: 12px; color: var(--neon-pink); margin-bottom: 6px;">Đang trích xuất nội dung...</div>
           <div class="progress-bar-bg">
             <div class="progress-bar-fill" id="uploadProgressBar" style="width: 0%;"></div>
           </div>
@@ -224,7 +242,7 @@
           <div class="form-group">
             <label for="geminiKeyInput">Mã Google Gemini API Key:</label>
             <input type="password" id="geminiKeyInput" class="form-control" placeholder="Dán mã AIzaSy... vào đây" />
-            <small class="form-help" style="color: var(--accent-pink-neon);">Lấy mã miễn phí từ Google AI Studio (aistudio.google.com).</small>
+            <small class="form-help" style="color: var(--neon-pink);">Lấy mã miễn phí từ Google AI Studio (aistudio.google.com).</small>
           </div>
           <div class="form-group">
             <label for="geminiModelSelect">Model Gemini:</label>
@@ -252,7 +270,7 @@
         </div>
 
         <div class="form-group" style="border-top: 1px dashed #3b0d61; padding-top: 16px; margin-top: 16px;">
-          <label for="systemPromptInput" style="color: var(--accent-pink-neon); font-weight: 700;">💎 Nhập Prompt Gem / Lời dặn riêng cho AI (Gem của tôi):</label>
+          <label for="systemPromptInput" style="color: var(--neon-pink); font-weight: 700;">💎 Nhập Prompt Gem / Lời dặn riêng cho AI (Gem của tôi):</label>
           <div style="display: flex; gap: 6px; margin-bottom: 8px;">
             <button type="button" class="quick-prompt-pill gem-template-btn" data-template="Bạn là Trợ lý AI chuyên nghiệp cho Kho Kiến Thức. Hãy đọc kỹ tài liệu và trả lời chính xác, ngắn gọn, có trích dẫn tên file.">💎 Gem Trợ lý Chuẩn</button>
             <button type="button" class="quick-prompt-pill gem-template-btn" data-template="Bạn là chuyên gia phân tích dữ liệu cao cấp. Hãy tóm tắt tài liệu dưới dạng danh sách gạch đầu dòng rõ ràng, liệt kê các số liệu quan trọng nhất.">💎 Gem Tóm tắt Số liệu</button>
@@ -275,7 +293,7 @@
         <button class="close-btn" id="closePreviewModalBtn">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="preview-meta-info" id="previewMetaInfo" style="font-size: 12px; color: var(--accent-pink-neon); margin-bottom: 12px;"></div>
+        <div class="preview-meta-info" id="previewMetaInfo" style="font-size: 12px; color: var(--neon-pink); margin-bottom: 12px;"></div>
         <pre class="preview-text-box" id="previewTextBox"></pre>
       </div>
       <div class="modal-footer">
