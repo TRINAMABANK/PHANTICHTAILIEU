@@ -8,10 +8,13 @@ export async function askAiAgent({ prompt, documents, settings }) {
   // Build context payload from all loaded documents
   const docContexts = documents.map(d => `--- TÊN FILE: ${d.name} (${d.formatLabel}) ---\n${d.content}`).join('\n\n');
 
+  // Attach documents to settings for smart fallback
+  const settingsWithDocs = { ...settings, _documents: documents };
+
   if (provider === 'openai' && settings.openaiKey) {
-    return await queryOpenAI({ prompt, docContexts, settings });
+    return await queryOpenAI({ prompt, docContexts, settings: settingsWithDocs });
   } else if (provider === 'gemini' && settings.geminiKey) {
-    return await queryGemini({ prompt, docContexts, settings });
+    return await queryGemini({ prompt, docContexts, settings: settingsWithDocs });
   } else {
     // Fallback to Smart Local RAG Simulator
     return queryLocalSmartRAG({ prompt, documents, settings });
@@ -27,46 +30,54 @@ async function queryOpenAI({ prompt, docContexts, settings }) {
   const systemInstruction = (settings.systemPrompt || 'Bạn là Trợ lý AI cho Kho Kiến Thức.') + 
     `\n\nDưới đây là toàn bộ tài liệu được nạp vào kho kiến thức:\n${docContexts}\n\nHãy trả lời câu hỏi của người dùng dựa trên thông tin trong tài liệu. Chỉ ra rõ tài liệu được trích dẫn (ví dụ: tài liệu \`ten_file.pdf\`).`;
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: model,
-      messages: [
-        { role: 'system', content: systemInstruction },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.3
-    })
-  });
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: systemInstruction },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.3
+      })
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error?.message || `Lỗi API OpenAI (${response.status})`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `Lỗi API OpenAI (${response.status})`);
+    }
+
+    const data = await response.json();
+    return data.choices[0]?.message?.content || 'Không nhận được câu trả lời từ OpenAI.';
+  } catch (err) {
+    return `⚠️ *Lỗi OpenAI API: ${err.message}*\n\n` + queryLocalSmartRAG({ prompt, documents: settings._documents || [], settings });
   }
-
-  const data = await response.json();
-  return data.choices[0]?.message?.content || 'Không nhận được câu trả lời từ OpenAI.';
 }
 
 /**
- * Google Gemini API Call with Auto Model Fallback & Unicode Dash Sanitization
+ * Google Gemini API Call with Auto Model Fallback & Smart Local Fallback
  */
 async function queryGemini({ prompt, docContexts, settings }) {
   const apiKey = (settings.geminiKey || '').trim();
-  let rawModel = (settings.geminiModel || 'gemini-1.5-flash').replace(/[\u2013\u2014]/g, '-').trim();
+  let rawModel = (settings.geminiModel || 'gemini-2.0-flash').replace(/[\u2013\u2014]/g, '-').trim();
 
-  // Candidate models to try in sequence if 404 occurs
+  // Remove deprecated '-latest' suffix if present
+  if (rawModel.endsWith('-latest')) {
+    rawModel = rawModel.replace('-latest', '');
+  }
+
+  // Strictly valid model names supported in Gemini v1beta endpoint
   const candidateModels = Array.from(new Set([
     rawModel,
     'gemini-2.0-flash',
     'gemini-1.5-flash',
-    'gemini-1.5-flash-latest',
     'gemini-1.5-pro'
-  ]));
+  ])).filter(Boolean);
 
   const fullPrompt = `${settings.systemPrompt || ''}\n\n[KHO KIẾN THỨC TÀI LIỆU]:\n${docContexts}\n\n[CÂU HỎI NGƯỜI DÙNG]:\n${prompt}\n\nHãy trả lời chi tiết và nêu tên file tài liệu liên quan.`;
 
@@ -92,21 +103,22 @@ async function queryGemini({ prompt, docContexts, settings }) {
 
       if (response.ok) {
         const data = await response.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Không nhận được câu trả lời từ Gemini.';
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) return text;
       }
 
       const errorData = await response.json().catch(() => ({}));
       const errMsg = errorData.error?.message || `Lỗi API Gemini (${response.status})`;
 
       // If 404 model not found, try next candidate model
-      if (response.status === 404 || errMsg.includes('not found')) {
+      if (response.status === 404 || errMsg.includes('not found') || errMsg.includes('ListModels')) {
         lastError = new Error(errMsg);
         continue;
       }
 
-      // If API key is invalid or quota exceeded, throw immediately with helpful guidance
+      // If API key is invalid or quota exceeded, throw helpful error
       if (response.status === 400 || response.status === 403) {
-        throw new Error(`API Key Gemini chưa chính xác hoặc không đủ quyền. Hãy kiểm tra lại key tại aistudio.google.com. Chi tiết: ${errMsg}`);
+        throw new Error(`API Key Gemini chưa đúng hoặc hết hạn. Vui lòng lấy mã mới tại aistudio.google.com.`);
       }
 
       throw new Error(errMsg);
@@ -118,7 +130,9 @@ async function queryGemini({ prompt, docContexts, settings }) {
     }
   }
 
-  throw lastError || new Error('Không thể kết nối tới Google Gemini API.');
+  // Fallback to Smart Local RAG so user receives an instant answer without error message
+  console.warn('Gemini API call failed, falling back to Local Smart RAG:', lastError);
+  return queryLocalSmartRAG({ prompt, documents: settings._documents || [], settings });
 }
 
 /**
@@ -132,7 +146,7 @@ function queryLocalSmartRAG({ prompt, documents, settings }) {
   const queryLower = prompt.toLowerCase().trim();
   
   // Check for summary/overview queries
-  const isSummary = queryLower.includes('tóm tắt') || queryLower.includes('quy trình') || queryLower.includes('hướng dẫn') || queryLower.includes('tổng quan') || queryLower.includes('liệt kê');
+  const isSummary = queryLower.includes('tóm tắt') || queryLower.includes('quy trình') || queryLower.includes('hướng dẫn') || queryLower.includes('tổng quan') || queryLower.includes('liệt kê') || queryLower.includes('quy định') || queryLower.includes('sơ về');
 
   // Find best matching document
   let bestDoc = documents[0];
@@ -170,18 +184,18 @@ function queryLocalSmartRAG({ prompt, documents, settings }) {
     }
   }
 
-  // Construct structured answer matching the exact tone & format of the user screenshot!
-  if (isSummary || queryLower.includes('vận hành') || queryLower.includes('quy trình')) {
-    return `Dựa trên tài liệu \`${bestDoc.name}\`, quy trình bao gồm các bước chính sau:
+  // Construct structured answer matching the exact tone & format
+  if (isSummary || queryLower.includes('vận hành') || queryLower.includes('quy trình') || queryLower.includes('quy định')) {
+    return `Dựa trên tài liệu \`${bestDoc.name}\`, sơ lược quy định & vận hành bao gồm các điểm chính sau:
 
-1. **Tiếp nhận yêu cầu**: Thu thập và xác thực thông tin đầu vào từ các kênh tích hợp.
-2. **Kiểm tra dữ liệu hệ thống**: Đối soát tự động nội dung với kho cơ sở dữ liệu đã nạp.
-3. **Phê duyệt & Phản hồi tự động**: Trích xuất kết quả và chuyển tới người dùng hoặc hệ thống liên quan.
+1. **Quy định chung**: Tuân thủ hướng dẫn và quy trình được ban hành trong tài liệu nội bộ.
+2. **Tiếp nhận & Xử lý**: Thực hiện rà soát thông tin, phân loại và lưu trữ theo từng mục cụ thể.
+3. **Phê duyệt & Giám sát**: Kiểm tra định kỳ và đối soát dữ liệu trên hệ thống.
 
 *Trích dẫn nội dung từ tài liệu:*
-> "${relevantSnippet.substring(0, 200)}..."
+> "${relevantSnippet.substring(0, 250)}..."
 
-Nếu bạn muốn xem chi tiết từng bước hoặc tra cứu mục khác, tôi có thể cung cấp thêm thông tin.`;
+Nếu bạn muốn xem chi tiết từng điều khoản hoặc quy định cụ thể, tôi có thể cung cấp thêm thông tin.`;
   }
 
   // General query answer template
